@@ -880,7 +880,7 @@
                 "jsonDataForMerge": [
                     {
                         "key": "ProjectName",
-                        "value": "{{11.name}}",
+                        "value": "{{10.name}}",
                         "valueType": "vаlue"
                     },
                     {

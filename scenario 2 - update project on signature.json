@@ -275,7 +275,7 @@
                 "__IMTCONN__": 27178
             },
             "mapper": {
-                "ID": "{{4.Body.externalId}}",
+                "ID": "{{4.Body.externalId.id}}",
                 "data": "{{8.body}}",
                 "fileName": "Signed Scope of Work[{{now}}].pdf",
                 "object_code": "OPTASK"
