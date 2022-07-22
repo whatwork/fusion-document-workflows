@@ -1,0 +1,743 @@
+{
+    "name": "ATB - Update Project on Signature",
+    "flow": [
+        {
+            "id": 1,
+            "module": "sign:watchEvents",
+            "version": 1,
+            "parameters": {
+                "__IMTHOOK__": 14722
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0,
+                    "name": "On Sign Event"
+                },
+                "restore": {
+                    "__IMTHOOK__": {
+                        "label": "On Document Sign"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTHOOK__",
+                        "type": "hook",
+                        "label": "Webhook",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 4,
+            "module": "sign:readARecord",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27176
+            },
+            "mapper": {
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "recordId": "{{1.agreement.id}}",
+                "object_code": "agreements"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0,
+                    "name": "Read Agreement"
+                },
+                "restore": {
+                    "headers": {
+                        "mode": "chose",
+                        "items": [
+                            "undefined"
+                        ]
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - Acrobat Sign "
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "Agreements"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "headers",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key"
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Headers"
+                    },
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Record type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "accounts",
+                                "agreements",
+                                "groups",
+                                "libraryDocuments",
+                                "messageTemplates",
+                                "users",
+                                "webhooks",
+                                "widgets",
+                                "workflows"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "recordId",
+                        "type": "text",
+                        "label": "Record ID",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 8,
+            "module": "sign:customApiCall",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27176
+            },
+            "filter": {
+                "name": "Signed with external ID",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{1.agreement.status}}",
+                            "b": "SIGNED",
+                            "o": "text:equal"
+                        },
+                        {
+                            "a": "{{4.Body.externalId}}",
+                            "b": "",
+                            "o": "exist"
+                        }
+                    ]
+                ]
+            },
+            "mapper": {
+                "url": "/agreements/{{1.agreement.id}}/combinedDocument?attachAuditReport=true",
+                "method": "GET",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 0,
+                    "name": "Download Signed Agreement"
+                },
+                "restore": {
+                    "qs": {
+                        "mode": "chose",
+                        "items": []
+                    },
+                    "method": {
+                        "mode": "chose",
+                        "label": "GET"
+                    },
+                    "headers": {
+                        "mode": "chose",
+                        "items": [
+                            "undefined"
+                        ]
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - Acrobat Sign "
+                    },
+                    "uploadTransientDocument": {
+                        "mode": "chose",
+                        "label": ""
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "url",
+                        "type": "text",
+                        "label": "URL",
+                        "required": true
+                    },
+                    {
+                        "name": "method",
+                        "type": "select",
+                        "label": "Method",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "GET",
+                                "POST",
+                                "PUT",
+                                "DELETE"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "headers",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key"
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Headers"
+                    },
+                    {
+                        "name": "qs",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key"
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Query string"
+                    },
+                    {
+                        "name": "body",
+                        "type": "any",
+                        "label": "Body"
+                    },
+                    {
+                        "name": "uploadTransientDocument",
+                        "type": "select",
+                        "label": "Upload a transient document",
+                        "validate": {
+                            "enum": [
+                                "Yes",
+                                "No"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": 9,
+            "module": "workfront-workfront:Upload",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "mapper": {
+                "ID": "{{4.Body.externalId}}",
+                "data": "{{8.body}}",
+                "fileName": "Signed Scope of Work[{{now}}].pdf",
+                "object_code": "OPTASK"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 0,
+                    "name": "Save SOW Document to Issue"
+                },
+                "restore": {
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "Issue"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "ID",
+                        "type": "text",
+                        "label": "Related Record ID",
+                        "required": true
+                    },
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Related Record Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "APPROVAL",
+                                "RATE",
+                                "CMPY",
+                                "DOCU",
+                                "DOCV",
+                                "EXPNS",
+                                "HOUR",
+                                "OPTASK",
+                                "ITRN",
+                                "ROLE",
+                                "MILE",
+                                "MPATH",
+                                "NOTE",
+                                "NTAG",
+                                "PORT",
+                                "PRGM",
+                                "PROJ",
+                                "PRTU",
+                                "RESVT",
+                                "RISK",
+                                "SPAPVR",
+                                "TASK",
+                                "TEAMOB",
+                                "Template",
+                                "TTSK",
+                                "TSHET",
+                                "USER"
+                            ]
+                        }
+                    },
+                    {
+                        "mean": "name",
+                        "name": "fileName",
+                        "type": "filename",
+                        "label": "Document name",
+                        "required": true
+                    },
+                    {
+                        "mean": "data",
+                        "name": "data",
+                        "type": "buffer",
+                        "label": "File content",
+                        "required": true
+                    },
+                    {
+                        "name": "folderIDs",
+                        "type": "text",
+                        "label": "Folder ID"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 5,
+            "module": "workfront-workfront:updateRecordDynamically",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "mapper": {
+                "ID": "{{4.Body.externalId.id}}",
+                "status": "CLS",
+                "fieldNames": [
+                    "description",
+                    "percentComplete",
+                    "status"
+                ],
+                "description": "The document has been signed by {{4.Body.participantSetsInfo[].memberInfos[].name}} ({{4.Body.participantSetsInfo[].memberInfos[].email}}) at {{4.Body.lastEventDate}}.",
+                "object_code": "OPTASK",
+                "percentComplete": "100"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1200,
+                    "y": 0,
+                    "name": "Resolve SOW Generation Issue"
+                },
+                "restore": {
+                    "status": {
+                        "mode": "chose",
+                        "label": "Closed"
+                    },
+                    "fieldNames": {
+                        "mode": "chose",
+                        "label": [
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "Issue"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "ID",
+                        "type": "text",
+                        "required": true
+                    },
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Record Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "ARVPRC",
+                                "ASSGN",
+                                "BILL",
+                                "RATE",
+                                "CMPY",
+                                "DOCU",
+                                "DOCFDR",
+                                "DOCV",
+                                "EXPNS",
+                                "EXPTYP",
+                                "GROUP",
+                                "HOUR",
+                                "HOURT",
+                                "OPTASK",
+                                "ITRN",
+                                "ROLE",
+                                "JRNLE",
+                                "MILE",
+                                "MPATH",
+                                "NOTE",
+                                "NTAG",
+                                "PORT",
+                                "PRGM",
+                                "PROJ",
+                                "PRTU",
+                                "RESVT",
+                                "RISK",
+                                "RSKTYP",
+                                "SPAPVR",
+                                "TASK",
+                                "TEAMOB",
+                                "Template",
+                                "TTSK",
+                                "TSHET",
+                                "USER"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "fieldNames",
+                        "type": "select",
+                        "label": "Select Fields to Map",
+                        "multiple": true,
+                        "validate": {
+                            "enum": [
+                                "actualCompletionDate",
+                                "actualCost",
+                                "actualStartDate",
+                                "actualWorkRequired",
+                                "approvalCompletionDate",
+                                "approvalProcessID",
+                                "approvalStartDate",
+                                "assignedToID",
+                                "auditTypes",
+                                "autoClosureDate",
+                                "backlogOrder",
+                                "categoryID",
+                                "color",
+                                "commitDate",
+                                "condition",
+                                "currentApprovalStepID",
+                                "customerID",
+                                "description",
+                                "enteredByID",
+                                "entryDate",
+                                "extRefID",
+                                "hasDocuments",
+                                "hasMessages",
+                                "hasNotes",
+                                "hasResolvables",
+                                "hasTimedNotifications",
+                                "isComplete",
+                                "isHelpDesk",
+                                "isReady",
+                                "iterationID",
+                                "kanbanBoardID",
+                                "lastConditionNoteID",
+                                "lastNoteID",
+                                "lastUpdateDate",
+                                "lastUpdatedByID",
+                                "name",
+                                "opTaskType",
+                                "ownerID",
+                                "percentComplete",
+                                "plannedCompletionDate",
+                                "plannedDurationMinutes",
+                                "plannedStartDate",
+                                "previousStatus",
+                                "priority",
+                                "projectID",
+                                "projectedDurationMinutes",
+                                "queueTopicID",
+                                "referenceNumber",
+                                "remainingDurationMinutes",
+                                "resolveOpTaskID",
+                                "resolveProjectID",
+                                "resolveTaskID",
+                                "resolvingObjCode",
+                                "resolvingObjID",
+                                "roleID",
+                                "severity",
+                                "sourceObjCode",
+                                "sourceObjID",
+                                "sourceTaskID",
+                                "status",
+                                "statusUpdate",
+                                "storyBoardOrder",
+                                "storyPoints",
+                                "submittedByID",
+                                "teamID",
+                                "url",
+                                "version",
+                                "work",
+                                "workRequired",
+                                "DE:Account Name",
+                                "DE:Activity",
+                                "DE:Additional Fixed Expense Cost",
+                                "DE:Adjustment Amount",
+                                "DE:Advertising Specs",
+                                "DE:Amount Due",
+                                "DE:Amount Received",
+                                "DE:Application",
+                                "DE:Bleed Required?",
+                                "DE:Blog Post Site/Location URL",
+                                "DE:Budget",
+                                "DE:Budget Adjustment Type",
+                                "DE:CTA",
+                                "DE:Campaign Overview/Brief",
+                                "DE:Change Order Category",
+                                "DE:Change Order Impact",
+                                "DE:Change Rationale",
+                                "DE:Client Name",
+                                "DE:Client URL or Account Number",
+                                "DE:Color",
+                                "DE:Computer Model",
+                                "DE:Copy",
+                                "DE:Cost Center",
+                                "DE:Customer Category",
+                                "DE:Customer Email",
+                                "DE:Customer First Name",
+                                "DE:Customer Last Name",
+                                "DE:Customer Project",
+                                "DE:Deadline Driver",
+                                "DE:Deliverables",
+                                "DE:Department/Business Unit",
+                                "DE:Describe Reporting Needs",
+                                "DE:Device",
+                                "DE:Digital Asset Type",
+                                "DE:Do you need a graphic created?",
+                                "DE:Document Attached",
+                                "DE:Employee Name",
+                                "DE:End Date",
+                                "DE:Exclusions/Assumptions/Special Considerations",
+                                "DE:Existing Job Reference Information",
+                                "DE:Existing Position/Headcount Information",
+                                "DE:Existing Process Reference Information",
+                                "DE:Expense Type",
+                                "DE:File Format",
+                                "DE:Finance Request Type",
+                                "DE:Geography/Region",
+                                "DE:Goal of Product Related Project",
+                                "DE:Goal of this project/campaign",
+                                "DE:Hashtags and Tags",
+                                "DE:IT Setup Type",
+                                "DE:Image or Video Responsible party",
+                                "DE:Insertion Date",
+                                "DE:Invoice Date",
+                                "DE:Invoice Number",
+                                "DE:Is This an Unplanned Project?",
+                                "DE:Is this region specific?",
+                                "DE:Issue Category",
+                                "DE:Issue Progress To Date",
+                                "DE:Issue Resolution",
+                                "DE:Jack Number",
+                                "DE:Job Description Attached?",
+                                "DE:Job Description Overview Brief",
+                                "DE:Job Number",
+                                "DE:Key Message Points",
+                                "DE:Key Objectives",
+                                "DE:Key Objectives & Success Metrics",
+                                "DE:Legal Request Type",
+                                "DE:Live Date",
+                                "DE:Materials Due Date To Pub",
+                                "DE:Mitigation Plan",
+                                "DE:New Product Project Overview/Brief",
+                                "DE:Note to customer",
+                                "DE:On Shelf Date",
+                                "DE:Operating System",
+                                "DE:Opportunity ID",
+                                "DE:Opportunity Name",
+                                "DE:Other Audience",
+                                "DE:Other Beneficiary",
+                                "DE:Other CTA",
+                                "DE:Other Change Order Category",
+                                "DE:Other Finance Request Type",
+                                "DE:Other Issue Category",
+                                "DE:Other Risk Category",
+                                "DE:Other Stakeholder",
+                                "DE:Other Video Format",
+                                "DE:Other Video Type",
+                                "DE:PDF Only or Print?",
+                                "DE:PO Date",
+                                "DE:PO Number",
+                                "DE:Paid Promotion",
+                                "DE:Payment Due Date",
+                                "DE:Payment Type",
+                                "DE:Phone Extension",
+                                "DE:Phone Type",
+                                "DE:Post Time Recommendation",
+                                "DE:Primary Goal",
+                                "DE:Print Asset Type",
+                                "DE:Problem Description",
+                                "DE:Process Beneficiary",
+                                "DE:Process Enhancement Type",
+                                "DE:Process Goal",
+                                "DE:Product Line",
+                                "DE:Product Project Type",
+                                "DE:Project Goal",
+                                "DE:Project Overview/Brief",
+                                "DE:Project Request Score",
+                                "DE:Publication Name",
+                                "DE:Push Page URL",
+                                "DE:Quantity",
+                                "DE:Received Date",
+                                "DE:Report Type",
+                                "DE:Request Type",
+                                "DE:Requested By",
+                                "DE:Required Video Format",
+                                "DE:Requisition Type",
+                                "DE:Resource Cost Estimate in Dollars",
+                                "DE:Resource Cost Estimate in Hours",
+                                "DE:Revenue Potential",
+                                "DE:Risk Category",
+                                "DE:Risk Impact",
+                                "DE:Risk Probability",
+                                "DE:Risk RAG",
+                                "DE:Risk Score",
+                                "DE:Salary Range/Budget",
+                                "DE:Salesforce Opportunity URL",
+                                "DE:Service Package Recommendation",
+                                "DE:Show on Dashboard",
+                                "DE:Social Sub-Type",
+                                "DE:Special Instructions",
+                                "DE:Stakeholders",
+                                "DE:Steps to Duplicate",
+                                "DE:Subject Line Suggestion",
+                                "DE:Suggested Asset Types",
+                                "DE:Suggested Dimensions",
+                                "DE:Target Audience",
+                                "DE:Target Due Date",
+                                "DE:Target Due Date -- First Send/Drop/Post/Air/Deploy Date",
+                                "DE:Target Start Date",
+                                "DE:Type",
+                                "DE:Vendor Name",
+                                "DE:Video Length",
+                                "DE:Video Type",
+                                "DE:Website",
+                                "DE:Website Landing Page URL",
+                                "DE:Which Regions?",
+                                "DE:Who else needs visibility into this request/project?",
+                                "DE:Who needs to approve this budget change?"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "type": "text",
+                        "label": "Description",
+                        "dynamic": true
+                    },
+                    {
+                        "name": "percentComplete",
+                        "type": "number",
+                        "label": "Percent Complete",
+                        "dynamic": true
+                    },
+                    {
+                        "name": "status",
+                        "type": "select",
+                        "label": "Status",
+                        "dynamic": true
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "app.workfrontfusion.com"
+    }
+}
