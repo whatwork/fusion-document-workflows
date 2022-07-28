@@ -1,0 +1,2293 @@
+{
+    "name": "ATB - Statement of Work Request",
+    "flow": [
+        {
+            "id": 2,
+            "module": "workfront-workfront:watchEvents",
+            "version": 1,
+            "parameters": {
+                "maxResults": 1,
+                "__IMTHOOK__": 14723
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0,
+                    "name": "On New SOW Request"
+                },
+                "restore": {
+                    "__IMTHOOK__": {
+                        "label": "New Statement of Work Requests"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTHOOK__",
+                        "type": "hook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "uinteger",
+                        "label": "Maximum number of returned events",
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "eventType",
+                        "type": "text"
+                    },
+                    {
+                        "name": "subscriptionId",
+                        "type": "text"
+                    },
+                    {
+                        "name": "newState",
+                        "spec": [
+                            {
+                                "name": "ID",
+                                "type": "text"
+                            },
+                            {
+                                "name": "accessorIDs",
+                                "spec": {
+                                    "type": "text"
+                                }
+                            },
+                            {
+                                "name": "assignedToID",
+                                "type": "text"
+                            },
+                            {
+                                "name": "categoryID",
+                                "type": "text"
+                            },
+                            {
+                                "name": "customerID",
+                                "type": "text"
+                            },
+                            {
+                                "name": "description",
+                                "type": "text"
+                            },
+                            {
+                                "name": "enteredByID",
+                                "type": "text"
+                            },
+                            {
+                                "name": "entryDate",
+                                "type": "date"
+                            },
+                            {
+                                "name": "lastUpdateDate",
+                                "type": "date"
+                            },
+                            {
+                                "name": "lastUpdatedByID",
+                                "type": "text"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text"
+                            },
+                            {
+                                "name": "ownerID",
+                                "type": "text"
+                            },
+                            {
+                                "name": "plannedCompletionDate",
+                                "type": "date"
+                            },
+                            {
+                                "name": "priority",
+                                "type": "number"
+                            },
+                            {
+                                "name": "projectID",
+                                "type": "text"
+                            },
+                            {
+                                "name": "referenceNumber",
+                                "type": "number"
+                            },
+                            {
+                                "name": "status",
+                                "type": "text"
+                            },
+                            {
+                                "name": "teamID",
+                                "type": "text"
+                            }
+                        ],
+                        "type": "collection"
+                    },
+                    {
+                        "name": "oldState",
+                        "spec": null,
+                        "type": "collection"
+                    },
+                    {
+                        "name": "eventTime",
+                        "type": "collection"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 18,
+            "module": "json:ParseJSON",
+            "version": 1,
+            "parameters": {
+                "type": 8606
+            },
+            "filter": {
+                "name": "Project ID Exists",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{2.newState.`DE:Customer Project`}}",
+                            "b": "",
+                            "o": "exist"
+                        }
+                    ]
+                ]
+            },
+            "mapper": {
+                "json": "{{2.newState.`DE:Customer Project`}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0,
+                    "name": "Get Project ID"
+                },
+                "restore": {
+                    "type": {
+                        "label": "Project Object"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "udt",
+                        "label": "Data structure"
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "json",
+                        "type": "text",
+                        "label": "JSON string",
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "objCode",
+                        "type": "text"
+                    },
+                    {
+                        "name": "name",
+                        "type": "text"
+                    },
+                    {
+                        "name": "ID",
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 5,
+            "module": "workfront-workfront:readRelatedRecords",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "mapper": {
+                "ID": "{{18.ID}}",
+                "fields": [
+                    "duration",
+                    "name",
+                    "status"
+                ],
+                "object_code": "TASK:Tasks:tasks",
+                "parent_object_code": "PROJ"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 0,
+                    "name": "Get Project Tasks"
+                },
+                "restore": {
+                    "fields": {
+                        "mode": "chose",
+                        "label": [
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "Tasks"
+                    },
+                    "parent_object_code": {
+                        "mode": "chose",
+                        "label": "Project"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "parent_object_code",
+                        "type": "select",
+                        "label": "Record Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "APPROVAL",
+                                "ASSGN",
+                                "CMPY",
+                                "DOCU",
+                                "DOCFDR",
+                                "OPTASK",
+                                "GROUP",
+                                "PORT",
+                                "PROJ",
+                                "TASK",
+                                "TSHET",
+                                "USER"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ID",
+                        "type": "text",
+                        "label": "Parent Record ID",
+                        "required": true
+                    },
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Collections",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "ACSRUL:accessRules:accessRules",
+                                "SCANS:alignmentValues:alignmentValues",
+                                "CSTEM:allConditions:allConditions",
+                                "HOUR:allHours:allHours",
+                                "CSTEM:allPriorities:allPriorities",
+                                "CSTEM:allStatuses:allStatuses",
+                                "ARVSTS:approverStatuses:approverStatuses",
+                                "AWAPVL:awaitingApprovals:awaitingApprovals",
+                                "BLIN:Baselines:baselines",
+                                "BILL:Billing Records:billingRecords",
+                                "SCANS:deliverableValues:deliverableValues",
+                                "DOCREQ:Document Requests:documentRequests",
+                                "DOCU:Documents:documents",
+                                "EXRATE:exchangeRates:exchangeRates",
+                                "EXPNS:Expenses:expenses",
+                                "HOURT:Hour Types:hourTypes",
+                                "HOUR:Hours:hours",
+                                "OBJCAT:objectCategories:objectCategories",
+                                "PTEAM:projectUserRoles:projectUserRoles",
+                                "PRTU:Project Users:projectUsers",
+                                "RATE:Rates:rates",
+                                "OPTASK:resolvables:resolvables",
+                                "RSALLO:Resource Estimates:resourceAllocations",
+                                "RESMGR:Resource Managers:resourceManagers",
+                                "RSPL:Resource Pools:resourcePools",
+                                "RISK:Risks:risks",
+                                "ROLE:Job Roles:roles",
+                                "RRUL:Routing Rules:routingRules",
+                                "TASK:Tasks:tasks",
+                                "UPDATE:Updates:updates"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "type": "select",
+                        "label": "Outputs",
+                        "multiple": true,
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "__IMTLENGTH__",
+                        "type": "uinteger",
+                        "label": "Total number of bundles"
+                    },
+                    {
+                        "name": "__IMTINDEX__",
+                        "type": "uinteger",
+                        "label": "Bundle order position"
+                    },
+                    {
+                        "name": "duration",
+                        "type": "number"
+                    },
+                    {
+                        "name": "name",
+                        "type": "text"
+                    },
+                    {
+                        "name": "status",
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 6,
+            "module": "builtin:BasicAggregator",
+            "version": 1,
+            "parameters": {
+                "feeder": 5
+            },
+            "mapper": {
+                "name": "{{5.name}}",
+                "status": "{{5.status}}",
+                "duration": "{{5.duration}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 0,
+                    "name": "Prepare Task JSON"
+                },
+                "restore": {
+                    "feeder": {
+                        "label": "Get Project Tasks - Read Related Records [5]"
+                    },
+                    "mapper": {
+                        "label": [
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "target": {
+                        "label": "Custom"
+                    }
+                }
+            }
+        },
+        {
+            "id": 10,
+            "module": "workfront-workfront:read",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "mapper": {
+                "ID": "{{18.ID}}",
+                "fields": [
+                    "description",
+                    "name"
+                ],
+                "object_code": "PROJ"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1200,
+                    "y": 0,
+                    "name": "Get Project Details"
+                },
+                "restore": {
+                    "fields": {
+                        "mode": "chose",
+                        "label": [
+                            null,
+                            null
+                        ]
+                    },
+                    "references": {
+                        "mode": "chose"
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    },
+                    "collections": {
+                        "mode": "chose"
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "Project"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Record Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "ARVPRC",
+                                "ASSGN",
+                                "BILL",
+                                "RATE",
+                                "CMPY",
+                                "DOCU",
+                                "DOCFDR",
+                                "DOCV",
+                                "EXPNS",
+                                "EXPTYP",
+                                "GROUP",
+                                "HOUR",
+                                "HOURT",
+                                "OPTASK",
+                                "ITRN",
+                                "ROLE",
+                                "JRNLE",
+                                "MILE",
+                                "MPATH",
+                                "NOTE",
+                                "NTAG",
+                                "PORT",
+                                "PRGM",
+                                "PROJ",
+                                "PRTU",
+                                "RESVT",
+                                "RISK",
+                                "RSKTYP",
+                                "SPAPVR",
+                                "TASK",
+                                "TEAMOB",
+                                "Template",
+                                "TTSK",
+                                "TSHET",
+                                "USER",
+                                "USRDEL"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ID",
+                        "type": "text",
+                        "required": true
+                    },
+                    {
+                        "name": "fields",
+                        "type": "select",
+                        "label": "Outputs",
+                        "dynamic": true,
+                        "multiple": true,
+                        "required": true
+                    },
+                    {
+                        "name": "references",
+                        "type": "select",
+                        "label": "References",
+                        "dynamic": true,
+                        "multiple": true
+                    },
+                    {
+                        "name": "collections",
+                        "type": "select",
+                        "label": "Collections",
+                        "dynamic": true,
+                        "multiple": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "description",
+                        "type": "text"
+                    },
+                    {
+                        "name": "name",
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 11,
+            "module": "workfront-workfront:read",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "mapper": {
+                "ID": "{{2.newState.enteredByID}}",
+                "fields": [
+                    "emailAddr",
+                    "name"
+                ],
+                "object_code": "USER"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1500,
+                    "y": 0,
+                    "name": "Get User Details"
+                },
+                "restore": {
+                    "fields": {
+                        "mode": "chose",
+                        "label": [
+                            null,
+                            null
+                        ]
+                    },
+                    "references": {
+                        "mode": "chose"
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    },
+                    "collections": {
+                        "mode": "chose"
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "User"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Record Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "ARVPRC",
+                                "ASSGN",
+                                "BILL",
+                                "RATE",
+                                "CMPY",
+                                "DOCU",
+                                "DOCFDR",
+                                "DOCV",
+                                "EXPNS",
+                                "EXPTYP",
+                                "GROUP",
+                                "HOUR",
+                                "HOURT",
+                                "OPTASK",
+                                "ITRN",
+                                "ROLE",
+                                "JRNLE",
+                                "MILE",
+                                "MPATH",
+                                "NOTE",
+                                "NTAG",
+                                "PORT",
+                                "PRGM",
+                                "PROJ",
+                                "PRTU",
+                                "RESVT",
+                                "RISK",
+                                "RSKTYP",
+                                "SPAPVR",
+                                "TASK",
+                                "TEAMOB",
+                                "Template",
+                                "TTSK",
+                                "TSHET",
+                                "USER",
+                                "USRDEL"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ID",
+                        "type": "text",
+                        "required": true
+                    },
+                    {
+                        "name": "fields",
+                        "type": "select",
+                        "label": "Outputs",
+                        "dynamic": true,
+                        "multiple": true,
+                        "required": true
+                    },
+                    {
+                        "name": "references",
+                        "type": "select",
+                        "label": "References",
+                        "dynamic": true,
+                        "multiple": true
+                    },
+                    {
+                        "name": "collections",
+                        "type": "select",
+                        "label": "Collections",
+                        "dynamic": true,
+                        "multiple": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "emailAddr",
+                        "type": "text"
+                    },
+                    {
+                        "name": "name",
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 12,
+            "module": "workfront-workfront:readRelatedRecords",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "mapper": {
+                "ID": "{{2.newState.projectID}}",
+                "fields": [
+                    "ID",
+                    "description",
+                    "docObjCode",
+                    "name"
+                ],
+                "object_code": "DOCU:Documents:documents",
+                "parent_object_code": "PROJ"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1800,
+                    "y": 0,
+                    "name": "Find Documents"
+                },
+                "restore": {
+                    "fields": {
+                        "mode": "chose",
+                        "label": [
+                            null,
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "Documents"
+                    },
+                    "parent_object_code": {
+                        "mode": "chose",
+                        "label": "Project"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "parent_object_code",
+                        "type": "select",
+                        "label": "Record Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "APPROVAL",
+                                "ASSGN",
+                                "CMPY",
+                                "DOCU",
+                                "DOCFDR",
+                                "OPTASK",
+                                "GROUP",
+                                "PORT",
+                                "PROJ",
+                                "TASK",
+                                "TSHET",
+                                "USER"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ID",
+                        "type": "text",
+                        "label": "Parent Record ID",
+                        "required": true
+                    },
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Collections",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "ACSRUL:accessRules:accessRules",
+                                "SCANS:alignmentValues:alignmentValues",
+                                "CSTEM:allConditions:allConditions",
+                                "HOUR:allHours:allHours",
+                                "CSTEM:allPriorities:allPriorities",
+                                "CSTEM:allStatuses:allStatuses",
+                                "ARVSTS:approverStatuses:approverStatuses",
+                                "AWAPVL:awaitingApprovals:awaitingApprovals",
+                                "BLIN:Baselines:baselines",
+                                "BILL:Billing Records:billingRecords",
+                                "SCANS:deliverableValues:deliverableValues",
+                                "DOCREQ:Document Requests:documentRequests",
+                                "DOCU:Documents:documents",
+                                "EXRATE:exchangeRates:exchangeRates",
+                                "EXPNS:Expenses:expenses",
+                                "HOURT:Hour Types:hourTypes",
+                                "HOUR:Hours:hours",
+                                "OBJCAT:objectCategories:objectCategories",
+                                "PTEAM:projectUserRoles:projectUserRoles",
+                                "PRTU:Project Users:projectUsers",
+                                "RATE:Rates:rates",
+                                "OPTASK:resolvables:resolvables",
+                                "RSALLO:Resource Estimates:resourceAllocations",
+                                "RESMGR:Resource Managers:resourceManagers",
+                                "RSPL:Resource Pools:resourcePools",
+                                "RISK:Risks:risks",
+                                "ROLE:Job Roles:roles",
+                                "RRUL:Routing Rules:routingRules",
+                                "TASK:Tasks:tasks",
+                                "UPDATE:Updates:updates"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "type": "select",
+                        "label": "Outputs",
+                        "multiple": true,
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "__IMTLENGTH__",
+                        "type": "uinteger",
+                        "label": "Total number of bundles"
+                    },
+                    {
+                        "name": "__IMTINDEX__",
+                        "type": "uinteger",
+                        "label": "Bundle order position"
+                    },
+                    {
+                        "name": "ID",
+                        "type": "text"
+                    },
+                    {
+                        "name": "description",
+                        "type": "text"
+                    },
+                    {
+                        "name": "docObjCode",
+                        "type": "text"
+                    },
+                    {
+                        "name": "name",
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 13,
+            "module": "workfront-workfront:Download",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "filter": {
+                "name": "SOW Template Only",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{12.name}}",
+                            "b": "StatementOfWorkTemplate",
+                            "o": "text:startwith"
+                        }
+                    ]
+                ]
+            },
+            "mapper": {
+                "documentID": "{{12.ID}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 2100,
+                    "y": 0,
+                    "name": "Download SOW Template"
+                },
+                "restore": {
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "documentID",
+                        "type": "text",
+                        "label": "Document ID",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 14,
+            "module": "workfront-adobe-pdf:generateDocument",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27179
+            },
+            "mapper": {
+                "file_data": "{{13.data}}",
+                "file_name": "{{13.fileName}}",
+                "outputFormat": "pdf",
+                "jsonDataForMerge": [
+                    {
+                        "key": "ProjectName",
+                        "value": "{{10.name}}",
+                        "valueType": "vаlue"
+                    },
+                    {
+                        "key": "CustomerFirstName",
+                        "value": "{{2.newState.`DE:Customer First Name`}}",
+                        "valueType": "vаlue"
+                    },
+                    {
+                        "key": "CustomerLastName",
+                        "value": "{{2.newState.`DE:Customer Last Name`}}",
+                        "valueType": "vаlue"
+                    },
+                    {
+                        "key": "Message",
+                        "value": "{{2.newState.`DE:Note to customer`}}",
+                        "valueType": "vаlue"
+                    },
+                    {
+                        "key": "CustomerEmail",
+                        "value": "{{2.newState.`DE:Customer Email`}}",
+                        "valueType": "vаlue"
+                    },
+                    {
+                        "key": "ProjectManagerEmail",
+                        "value": "{{11.emailAddr}}",
+                        "valueType": "vаlue"
+                    },
+                    {
+                        "key": "ProjectManagerName",
+                        "value": "{{11.name}}",
+                        "valueType": "vаlue"
+                    },
+                    {
+                        "key": "tasks",
+                        "value": "{{6.array}}",
+                        "valueType": "array"
+                    },
+                    {
+                        "key": "ProjectDescription",
+                        "value": "{{10.description}}",
+                        "valueType": "vаlue"
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 2400,
+                    "y": 0,
+                    "name": "Generate Statement of Work"
+                },
+                "restore": {
+                    "__IMTCONN__": {
+                        "label": "ATB - PDF Services "
+                    },
+                    "outputFormat": {
+                        "mode": "chose",
+                        "label": "PDF"
+                    },
+                    "jsonDataForMerge": {
+                        "mode": "chose",
+                        "items": [
+                            {
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Vаlue"
+                                }
+                            },
+                            {
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Vаlue"
+                                }
+                            },
+                            {
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Vаlue"
+                                }
+                            },
+                            {
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Vаlue"
+                                }
+                            },
+                            {
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Vаlue"
+                                }
+                            },
+                            {
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Vаlue"
+                                }
+                            },
+                            {
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Vаlue"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "mode": "edit"
+                                },
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Array of objects"
+                                }
+                            },
+                            {
+                                "valueType": {
+                                    "mode": "chose",
+                                    "label": "Vаlue"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "mean": "name",
+                        "name": "file_name",
+                        "type": "filename",
+                        "label": "File name",
+                        "required": true,
+                        "extension": [
+                            "docx"
+                        ]
+                    },
+                    {
+                        "mean": "data",
+                        "name": "file_data",
+                        "type": "buffer",
+                        "label": "Data",
+                        "required": true
+                    },
+                    {
+                        "name": "outputFormat",
+                        "type": "select",
+                        "label": "Output Format",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "pdf",
+                                "docx"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "jsonDataForMerge",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key"
+                            },
+                            {
+                                "name": "valueType",
+                                "type": "select",
+                                "label": "Value Type",
+                                "options": [
+                                    {
+                                        "label": "Array of objects",
+                                        "value": "array",
+                                        "nested": [
+                                            {
+                                                "mode": "edit",
+                                                "name": "value",
+                                                "spec": [],
+                                                "type": "array",
+                                                "label": "Array",
+                                                "labels": {
+                                                    "add": "Use Mapped mode to add an array item",
+                                                    "edit": "Use Mapped mode to add an array item",
+                                                    "field": "Use Mapped mode to add an array item"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "label": "Object",
+                                        "value": "object",
+                                        "nested": [
+                                            {
+                                                "name": "value",
+                                                "type": "json",
+                                                "label": "Value",
+                                                "schema": {
+                                                    "type": "object",
+                                                    "properties": {},
+                                                    "additionalProperties": true
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "label": "Vаlue",
+                                        "value": "vаlue",
+                                        "nested": [
+                                            {
+                                                "name": "value",
+                                                "type": "text",
+                                                "label": "Value"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "required": true
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Data For Merge"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 15,
+            "module": "sign:uploadTransientDocument",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27176
+            },
+            "mapper": {
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "multipart/form-data"
+                    }
+                ],
+                "file_data": "{{14.data}}",
+                "file_name": "{{14.filename}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 2700,
+                    "y": 0,
+                    "name": "Create Transient Contract"
+                },
+                "restore": {
+                    "headers": {
+                        "mode": "chose",
+                        "items": [
+                            "undefined"
+                        ]
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - Acrobat Sign "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "headers",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key"
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Headers"
+                    },
+                    {
+                        "mean": "name",
+                        "name": "file_name",
+                        "type": "filename",
+                        "label": "File name",
+                        "required": true
+                    },
+                    {
+                        "mean": "data",
+                        "name": "file_data",
+                        "type": "buffer",
+                        "label": "Data",
+                        "required": true
+                    },
+                    {
+                        "name": "mime_type",
+                        "type": "text",
+                        "label": "MIME type"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 16,
+            "module": "sign:createAgreement",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27176
+            },
+            "mapper": {
+                "name": "Statement of Work.pdf",
+                "state": "IN_PROCESS",
+                "locale": "en_US",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "fileInfos": [
+                    {
+                        "fileType": "transientDocumentId",
+                        "transientDocumentId": "{{15.body.transientDocumentId}}"
+                    }
+                ],
+                "externalId": {
+                    "id": "{{2.newState.ID}}"
+                },
+                "notaryInfo": {},
+                "emailOption": {
+                    "sendOptions": {}
+                },
+                "vaultingInfo": {},
+                "signatureType": "ESIGN",
+                "securityOption": {},
+                "participantSetsInfo": [
+                    {
+                        "name": "{{2.newState.`DE:Customer First Name`}} {{2.newState.`DE:Customer Last Name`}}",
+                        "role": "SIGNER",
+                        "order": "1",
+                        "memberInfos": [
+                            {
+                                "email": "{{2.newState.`DE:Customer Email`}}"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 3000,
+                    "y": 0,
+                    "name": "Send For Signature"
+                },
+                "restore": {
+                    "ccs": {
+                        "mode": "chose",
+                        "items": []
+                    },
+                    "type": {
+                        "mode": "chose",
+                        "label": ""
+                    },
+                    "state": {
+                        "mode": "chose",
+                        "label": "In process"
+                    },
+                    "locale": {
+                        "mode": "chose",
+                        "label": "English: US"
+                    },
+                    "headers": {
+                        "mode": "chose",
+                        "items": [
+                            "undefined"
+                        ]
+                    },
+                    "fileInfos": {
+                        "mode": "chose",
+                        "items": [
+                            {
+                                "fileType": {
+                                    "mode": "chose",
+                                    "label": "Transient document ID"
+                                },
+                                "notarize": {
+                                    "mode": "chose"
+                                }
+                            }
+                        ]
+                    },
+                    "notaryInfo": {
+                        "nested": {
+                            "payment": {
+                                "mode": "chose",
+                                "label": ""
+                            },
+                            "notaryType": {
+                                "mode": "chose",
+                                "label": ""
+                            }
+                        }
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - Acrobat Sign "
+                    },
+                    "emailOption": {
+                        "nested": {
+                            "sendOptions": {
+                                "nested": {
+                                    "initEmails": {
+                                        "mode": "chose",
+                                        "label": ""
+                                    },
+                                    "inFlightEmails": {
+                                        "mode": "chose",
+                                        "label": ""
+                                    },
+                                    "completionEmails": {
+                                        "mode": "chose",
+                                        "label": ""
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "vaultingInfo": {
+                        "nested": {
+                            "enabled": {
+                                "mode": "chose"
+                            }
+                        }
+                    },
+                    "signatureType": {
+                        "mode": "chose",
+                        "label": "E-sign"
+                    },
+                    "mergeFieldInfo": {
+                        "mode": "chose",
+                        "items": []
+                    },
+                    "participantSetsInfo": {
+                        "mode": "chose",
+                        "items": [
+                            {
+                                "role": {
+                                    "mode": "chose",
+                                    "label": "Signer"
+                                },
+                                "memberInfos": {
+                                    "mode": "chose",
+                                    "items": [
+                                        {
+                                            "securityOptionValue": {
+                                                "mode": "chose",
+                                                "label": ""
+                                            }
+                                        }
+                                    ]
+                                },
+                                "visiblePages": {
+                                    "mode": "chose",
+                                    "items": []
+                                }
+                            }
+                        ]
+                    },
+                    "postSignOptionValue": {
+                        "mode": "chose",
+                        "label": ""
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "headers",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "text",
+                                "label": "Key"
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Headers"
+                    },
+                    {
+                        "name": "fileInfos",
+                        "spec": [
+                            {
+                                "name": "fileType",
+                                "type": "select",
+                                "label": "File type",
+                                "options": [
+                                    {
+                                        "label": "Document",
+                                        "value": "document"
+                                    },
+                                    {
+                                        "label": "Library document ID",
+                                        "value": "libraryDocumentId"
+                                    },
+                                    {
+                                        "label": "Transient document ID",
+                                        "value": "transientDocumentId"
+                                    },
+                                    {
+                                        "label": "URL file info",
+                                        "value": "urlFileInfo"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "notarize",
+                                "type": "boolean",
+                                "label": "Notarize"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Files to send",
+                        "required": true
+                    },
+                    {
+                        "name": "name",
+                        "type": "text",
+                        "label": "Agreement name",
+                        "required": true
+                    },
+                    {
+                        "name": "participantSetsInfo",
+                        "spec": [
+                            {
+                                "name": "memberInfos",
+                                "spec": [
+                                    {
+                                        "name": "email",
+                                        "type": "text",
+                                        "label": "Email",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "securityOptionValue",
+                                        "type": "select",
+                                        "label": "Security option",
+                                        "options": [
+                                            {
+                                                "label": "Yes",
+                                                "value": "YES"
+                                            },
+                                            {
+                                                "label": "No",
+                                                "value": "NO"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "type": "array",
+                                "label": "Members",
+                                "required": true
+                            },
+                            {
+                                "name": "order",
+                                "type": "uinteger",
+                                "label": "Order",
+                                "required": true
+                            },
+                            {
+                                "name": "role",
+                                "type": "select",
+                                "label": "Role",
+                                "options": [
+                                    {
+                                        "label": "Signer",
+                                        "value": "SIGNER"
+                                    },
+                                    {
+                                        "label": "Approver",
+                                        "value": "APPROVER"
+                                    },
+                                    {
+                                        "label": "Acceptor",
+                                        "value": "ACCEPTOR"
+                                    },
+                                    {
+                                        "label": "From filler",
+                                        "value": "FORM_FILLER"
+                                    },
+                                    {
+                                        "label": "Certified recipient",
+                                        "value": "CERTIFIED_RECIPIENT"
+                                    },
+                                    {
+                                        "label": "Delegate to signer",
+                                        "value": "DELEGATE_TO_SIGNER"
+                                    },
+                                    {
+                                        "label": "Delegate to approver",
+                                        "value": "DELEGATE_TO_APPROVER"
+                                    },
+                                    {
+                                        "label": "Delegate to from filler",
+                                        "value": "DELEGATE_TO_FORM_FILLER"
+                                    },
+                                    {
+                                        "label": "Delegate to acceptor",
+                                        "value": "DELEGATE_TO_ACCEPTOR"
+                                    },
+                                    {
+                                        "label": "Delegate to certified recipient",
+                                        "value": "DELEGATE_TO_CERTIFIED_RECIPIENT"
+                                    },
+                                    {
+                                        "label": "Notary signer",
+                                        "value": "NOTARY_SIGNER"
+                                    },
+                                    {
+                                        "label": "Share",
+                                        "value": "SHARE"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "ID"
+                            },
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            },
+                            {
+                                "name": "privateMessage",
+                                "type": "text",
+                                "label": "Private message"
+                            },
+                            {
+                                "name": "visiblePages",
+                                "spec": {
+                                    "type": "text",
+                                    "label": "File label"
+                                },
+                                "type": "array",
+                                "label": "Visible pages"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Participant sets",
+                        "required": true
+                    },
+                    {
+                        "name": "signatureType",
+                        "type": "select",
+                        "label": "Signature type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "ESIGN",
+                                "WRITTEN"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "state",
+                        "type": "select",
+                        "label": "State",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "AUTHORING",
+                                "DRAFT",
+                                "IN_PROCESS"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ccs",
+                        "spec": [
+                            {
+                                "name": "email",
+                                "type": "text",
+                                "label": "Email"
+                            },
+                            {
+                                "name": "label",
+                                "type": "text",
+                                "label": "Label"
+                            },
+                            {
+                                "name": "visiblePages",
+                                "spec": {
+                                    "type": "text",
+                                    "label": "File label"
+                                },
+                                "type": "array",
+                                "label": "Visible pages"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "CCs"
+                    },
+                    {
+                        "name": "expirationTime",
+                        "type": "date",
+                        "label": "Expiration time"
+                    },
+                    {
+                        "name": "externalId",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "ID"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "External ID"
+                    },
+                    {
+                        "name": "firstReminderDelay",
+                        "type": "uinteger",
+                        "label": "First reminder delay",
+                        "validate": {
+                            "min": 1
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "type": "select",
+                        "label": "Locale"
+                    },
+                    {
+                        "name": "mergeFieldInfo",
+                        "spec": [
+                            {
+                                "name": "fieldName",
+                                "type": "text",
+                                "label": "Field name",
+                                "required": true
+                            },
+                            {
+                                "name": "defaultValue",
+                                "type": "text",
+                                "label": "Default value",
+                                "required": true
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Default field values"
+                    },
+                    {
+                        "name": "message",
+                        "type": "text",
+                        "label": "Message"
+                    },
+                    {
+                        "name": "notaryInfo",
+                        "spec": [
+                            {
+                                "name": "appointment",
+                                "type": "date",
+                                "label": "Appointment"
+                            },
+                            {
+                                "name": "note",
+                                "type": "text",
+                                "label": "Note"
+                            },
+                            {
+                                "name": "payment",
+                                "type": "select",
+                                "label": "Payment",
+                                "validate": {
+                                    "enum": [
+                                        "BY_SENDER",
+                                        "BY_SIGNER"
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "notaryType",
+                                "type": "select",
+                                "label": "Notary type",
+                                "validate": {
+                                    "enum": [
+                                        "PROVIDER_NOTARY",
+                                        "BYON_NOTARY"
+                                    ]
+                                }
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Notary"
+                    },
+                    {
+                        "name": "postSignOptionValue",
+                        "type": "select",
+                        "label": "Post sign option",
+                        "validate": {
+                            "enum": [
+                                "YES",
+                                "NO"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "securityOption",
+                        "spec": [
+                            {
+                                "name": "openPassword",
+                                "type": "text",
+                                "label": "Open password"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Security option"
+                    },
+                    {
+                        "name": "vaultingInfo",
+                        "spec": [
+                            {
+                                "name": "enabled",
+                                "type": "boolean",
+                                "label": "Enabled"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Vault agreement"
+                    },
+                    {
+                        "name": "type",
+                        "type": "select",
+                        "label": "Agreement type",
+                        "validate": {
+                            "enum": [
+                                "AGREEMENT",
+                                "MEGASIGN_CHILD",
+                                "WIDGET_INSTANCE"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "emailOption",
+                        "spec": [
+                            {
+                                "name": "sendOptions",
+                                "spec": [
+                                    {
+                                        "name": "completionEmails",
+                                        "type": "select",
+                                        "label": "Completion emails",
+                                        "validate": {
+                                            "enum": [
+                                                "ALL",
+                                                "NONE"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "inFlightEmails",
+                                        "type": "select",
+                                        "label": "In-flight emails",
+                                        "validate": {
+                                            "enum": [
+                                                "ALL",
+                                                "NONE"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "initEmails",
+                                        "type": "select",
+                                        "label": "Init emails",
+                                        "validate": {
+                                            "enum": [
+                                                "ALL",
+                                                "NONE"
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "type": "collection",
+                                "label": "Send options"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Email option"
+                    }
+                ],
+                "advanced": true
+            }
+        },
+        {
+            "id": 17,
+            "module": "workfront-workfront:updateRecordDynamically",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "mapper": {
+                "ID": "{{2.newState.ID}}",
+                "status": "AWF",
+                "fieldNames": [
+                    "status"
+                ],
+                "object_code": "OPTASK"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 3300,
+                    "y": 0,
+                    "name": "Update Issue Status"
+                },
+                "restore": {
+                    "status": {
+                        "mode": "chose",
+                        "label": "Awaiting Feedback"
+                    },
+                    "fieldNames": {
+                        "mode": "chose",
+                        "label": [
+                            null
+                        ]
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "Issue"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "ID",
+                        "type": "text",
+                        "required": true
+                    },
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Record Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "ARVPRC",
+                                "ASSGN",
+                                "BILL",
+                                "RATE",
+                                "CMPY",
+                                "DOCU",
+                                "DOCFDR",
+                                "DOCV",
+                                "EXPNS",
+                                "EXPTYP",
+                                "GROUP",
+                                "HOUR",
+                                "HOURT",
+                                "OPTASK",
+                                "ITRN",
+                                "ROLE",
+                                "JRNLE",
+                                "MILE",
+                                "MPATH",
+                                "NOTE",
+                                "NTAG",
+                                "PORT",
+                                "PRGM",
+                                "PROJ",
+                                "PRTU",
+                                "RESVT",
+                                "RISK",
+                                "RSKTYP",
+                                "SPAPVR",
+                                "TASK",
+                                "TEAMOB",
+                                "Template",
+                                "TTSK",
+                                "TSHET",
+                                "USER"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "fieldNames",
+                        "type": "select",
+                        "label": "Select Fields to Map",
+                        "multiple": true,
+                        "validate": {
+                            "enum": [
+                                "actualCompletionDate",
+                                "actualCost",
+                                "actualStartDate",
+                                "actualWorkRequired",
+                                "approvalCompletionDate",
+                                "approvalProcessID",
+                                "approvalStartDate",
+                                "assignedToID",
+                                "auditTypes",
+                                "autoClosureDate",
+                                "backlogOrder",
+                                "categoryID",
+                                "color",
+                                "commitDate",
+                                "condition",
+                                "currentApprovalStepID",
+                                "customerID",
+                                "description",
+                                "enteredByID",
+                                "entryDate",
+                                "extRefID",
+                                "hasDocuments",
+                                "hasMessages",
+                                "hasNotes",
+                                "hasResolvables",
+                                "hasTimedNotifications",
+                                "isComplete",
+                                "isHelpDesk",
+                                "isReady",
+                                "iterationID",
+                                "kanbanBoardID",
+                                "lastConditionNoteID",
+                                "lastNoteID",
+                                "lastUpdateDate",
+                                "lastUpdatedByID",
+                                "name",
+                                "opTaskType",
+                                "ownerID",
+                                "percentComplete",
+                                "plannedCompletionDate",
+                                "plannedDurationMinutes",
+                                "plannedStartDate",
+                                "previousStatus",
+                                "priority",
+                                "projectID",
+                                "projectedDurationMinutes",
+                                "queueTopicID",
+                                "referenceNumber",
+                                "remainingDurationMinutes",
+                                "resolveOpTaskID",
+                                "resolveProjectID",
+                                "resolveTaskID",
+                                "resolvingObjCode",
+                                "resolvingObjID",
+                                "roleID",
+                                "severity",
+                                "sourceObjCode",
+                                "sourceObjID",
+                                "sourceTaskID",
+                                "status",
+                                "statusUpdate",
+                                "storyBoardOrder",
+                                "storyPoints",
+                                "submittedByID",
+                                "teamID",
+                                "url",
+                                "version",
+                                "work",
+                                "workRequired",
+                                "DE:Account Name",
+                                "DE:Activity",
+                                "DE:Additional Fixed Expense Cost",
+                                "DE:Adjustment Amount",
+                                "DE:Advertising Specs",
+                                "DE:Amount Due",
+                                "DE:Amount Received",
+                                "DE:Application",
+                                "DE:Bleed Required?",
+                                "DE:Blog Post Site/Location URL",
+                                "DE:Budget",
+                                "DE:Budget Adjustment Type",
+                                "DE:CTA",
+                                "DE:Campaign Overview/Brief",
+                                "DE:Change Order Category",
+                                "DE:Change Order Impact",
+                                "DE:Change Rationale",
+                                "DE:Client Name",
+                                "DE:Client URL or Account Number",
+                                "DE:Color",
+                                "DE:Computer Model",
+                                "DE:Copy",
+                                "DE:Cost Center",
+                                "DE:Customer Category",
+                                "DE:Customer Email",
+                                "DE:Customer First Name",
+                                "DE:Customer Last Name",
+                                "DE:Customer Project",
+                                "DE:Deadline Driver",
+                                "DE:Deliverables",
+                                "DE:Department/Business Unit",
+                                "DE:Describe Reporting Needs",
+                                "DE:Device",
+                                "DE:Digital Asset Type",
+                                "DE:Do you need a graphic created?",
+                                "DE:Document Attached",
+                                "DE:Employee Name",
+                                "DE:End Date",
+                                "DE:Exclusions/Assumptions/Special Considerations",
+                                "DE:Existing Job Reference Information",
+                                "DE:Existing Position/Headcount Information",
+                                "DE:Existing Process Reference Information",
+                                "DE:Expense Type",
+                                "DE:File Format",
+                                "DE:Finance Request Type",
+                                "DE:Geography/Region",
+                                "DE:Goal of Product Related Project",
+                                "DE:Goal of this project/campaign",
+                                "DE:Hashtags and Tags",
+                                "DE:IT Setup Type",
+                                "DE:Image or Video Responsible party",
+                                "DE:Insertion Date",
+                                "DE:Invoice Date",
+                                "DE:Invoice Number",
+                                "DE:Is This an Unplanned Project?",
+                                "DE:Is this region specific?",
+                                "DE:Issue Category",
+                                "DE:Issue Progress To Date",
+                                "DE:Issue Resolution",
+                                "DE:Jack Number",
+                                "DE:Job Description Attached?",
+                                "DE:Job Description Overview Brief",
+                                "DE:Job Number",
+                                "DE:Key Message Points",
+                                "DE:Key Objectives",
+                                "DE:Key Objectives & Success Metrics",
+                                "DE:Legal Request Type",
+                                "DE:Live Date",
+                                "DE:Materials Due Date To Pub",
+                                "DE:Mitigation Plan",
+                                "DE:New Product Project Overview/Brief",
+                                "DE:Note to customer",
+                                "DE:On Shelf Date",
+                                "DE:Operating System",
+                                "DE:Opportunity ID",
+                                "DE:Opportunity Name",
+                                "DE:Other Audience",
+                                "DE:Other Beneficiary",
+                                "DE:Other CTA",
+                                "DE:Other Change Order Category",
+                                "DE:Other Finance Request Type",
+                                "DE:Other Issue Category",
+                                "DE:Other Risk Category",
+                                "DE:Other Stakeholder",
+                                "DE:Other Video Format",
+                                "DE:Other Video Type",
+                                "DE:PDF Only or Print?",
+                                "DE:PO Date",
+                                "DE:PO Number",
+                                "DE:Paid Promotion",
+                                "DE:Payment Due Date",
+                                "DE:Payment Type",
+                                "DE:Phone Extension",
+                                "DE:Phone Type",
+                                "DE:Post Time Recommendation",
+                                "DE:Primary Goal",
+                                "DE:Print Asset Type",
+                                "DE:Problem Description",
+                                "DE:Process Beneficiary",
+                                "DE:Process Enhancement Type",
+                                "DE:Process Goal",
+                                "DE:Product Line",
+                                "DE:Product Project Type",
+                                "DE:Project Goal",
+                                "DE:Project Overview/Brief",
+                                "DE:Project Request Score",
+                                "DE:Publication Name",
+                                "DE:Push Page URL",
+                                "DE:Quantity",
+                                "DE:Received Date",
+                                "DE:Report Type",
+                                "DE:Request Type",
+                                "DE:Requested By",
+                                "DE:Required Video Format",
+                                "DE:Requisition Type",
+                                "DE:Resource Cost Estimate in Dollars",
+                                "DE:Resource Cost Estimate in Hours",
+                                "DE:Revenue Potential",
+                                "DE:Risk Category",
+                                "DE:Risk Impact",
+                                "DE:Risk Probability",
+                                "DE:Risk RAG",
+                                "DE:Risk Score",
+                                "DE:Salary Range/Budget",
+                                "DE:Salesforce Opportunity URL",
+                                "DE:Service Package Recommendation",
+                                "DE:Show on Dashboard",
+                                "DE:Social Sub-Type",
+                                "DE:Special Instructions",
+                                "DE:Stakeholders",
+                                "DE:Steps to Duplicate",
+                                "DE:Subject Line Suggestion",
+                                "DE:Suggested Asset Types",
+                                "DE:Suggested Dimensions",
+                                "DE:Target Audience",
+                                "DE:Target Due Date",
+                                "DE:Target Due Date -- First Send/Drop/Post/Air/Deploy Date",
+                                "DE:Target Start Date",
+                                "DE:Type",
+                                "DE:Vendor Name",
+                                "DE:Video Length",
+                                "DE:Video Type",
+                                "DE:Website",
+                                "DE:Website Landing Page URL",
+                                "DE:Which Regions?",
+                                "DE:Who else needs visibility into this request/project?",
+                                "DE:Who needs to approve this budget change?"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "type": "select",
+                        "label": "Status",
+                        "dynamic": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 19,
+            "module": "workfront-workfront:miscAction",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 27178
+            },
+            "mapper": {
+                "ID": "{{2.newState.ID}}",
+                "action": "move",
+                "projectID": "{{18.ID}}",
+                "object_code": "OPTASK"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 3600,
+                    "y": 0,
+                    "name": "Move issue to customer project"
+                },
+                "restore": {
+                    "action": {
+                        "mode": "chose",
+                        "label": "Move"
+                    },
+                    "projectID": {
+                        "mode": "edit"
+                    },
+                    "__IMTCONN__": {
+                        "label": "ATB - dmenable workfront (Wes Hopkins | dmenable.my.workfront.com)"
+                    },
+                    "object_code": {
+                        "mode": "chose",
+                        "label": "Issue"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "object_code",
+                        "type": "select",
+                        "label": "Record Type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "APPROVAL",
+                                "ASSGN",
+                                "CMPY",
+                                "DOCU",
+                                "DOCFDR",
+                                "DOCV",
+                                "EXPNS",
+                                "GROUP",
+                                "OPTASK",
+                                "JRNLE",
+                                "NOTE",
+                                "PORT",
+                                "PRGM",
+                                "PROJ",
+                                "TASK",
+                                "TTSK",
+                                "USER"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "action",
+                        "type": "select",
+                        "label": "Action",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "acceptWork",
+                                "approveApproval",
+                                "assign",
+                                "assignCategories",
+                                "assignMultiple",
+                                "bulkMove",
+                                "calculateDataExtension",
+                                "convertToProject",
+                                "convertToTask",
+                                "copyIssue",
+                                "linkExternalObject",
+                                "markDone",
+                                "markNotDone",
+                                "move",
+                                "moveToTask",
+                                "recallApproval",
+                                "rejectApproval",
+                                "replyToAssignment",
+                                "unacceptWork",
+                                "unassign",
+                                "unlinkExternalObject"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "ID",
+                        "type": "text"
+                    },
+                    {
+                        "name": "projectID",
+                        "type": "typeahead",
+                        "dynamic": true,
+                        "options": {
+                            "label": "label",
+                            "store": "rpc://workfront-workfront/1/getObjectFieldValues?action_object_code=OPTASK&fields=[\"ID\",\"name\"]&label=name&object_code=PROJ&reference_name=projectID",
+                            "value": "value",
+                            "default": "default"
+                        },
+                        "reloadable": true
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "app.workfrontfusion.com"
+    }
+}
