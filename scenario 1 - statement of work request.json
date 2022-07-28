@@ -143,6 +143,18 @@
             "parameters": {
                 "type": 8606
             },
+            "filter": {
+                "name": "Project ID Exists",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{2.newState.`DE:Customer Project`}}",
+                            "b": "",
+                            "o": "exist"
+                        }
+                    ]
+                ]
+            },
             "mapper": {
                 "json": "{{2.newState.`DE:Customer Project`}}"
             },
